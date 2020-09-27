@@ -41,15 +41,15 @@ class ConversationController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="getConversations")
+     * @Route("/", name="newConversations", methods={"POST"})
      * @param Request $request
-     * @param int $id
      * @return JsonResponse
      * @throws Exception
      */
-    public function index(Request $request, int $id)
+    public function index(Request $request)
     {
-        $otherUser = $this->userRepository->find($id);
+        $otherUser = $request->get('otherUser', 0);
+        $otherUser = $this->userRepository->find($otherUser);
 
         if(is_null($otherUser)){
             throw new Exception("Nincs ilyen felhasználó");
@@ -96,5 +96,14 @@ class ConversationController extends AbstractController
         return $this->json([
             'id' => $conversation->getId()
         ], Response::HTTP_CREATED, [], []);
+    }
+
+    /**
+     * @Route("/", name="getConversations", methods={"GET"})
+     */
+    public function getConservation() {
+        $conversations = $this->conversationRepository->findConversationByUser($this->getUser()->getId());
+
+        return $this->json($conversations);
     }
 }
